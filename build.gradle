@@ -11,6 +11,11 @@ abstract class ProblemTask extends DefaultTask {
     @OutputFiles
     abstract ConfigurableFileCollection getLibraryFiles()
 
+//    @OutputFiles
+//    abstract final ConfigurableFileCollection libraryFiles = project.objects.fileCollection().from(project.provider {
+//        outputDir.map { it.files("${libName.get()}-${libVersion.get()}-eg.txt") }
+//    } as Provider<FileCollection>)
+
     @TaskAction
     void exec() {
         // The point here is that the command generates an output file in the output dir
