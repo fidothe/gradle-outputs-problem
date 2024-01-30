@@ -1,0 +1,37 @@
+abstract class ProblemTask extends DefaultTask {
+    @Input
+    abstract Property<String> getLibName()
+
+    @Input
+    abstract Property<String> getLibVersion()
+
+    @OutputDirectory
+    abstract DirectoryProperty getOutputDir()
+
+    @OutputFiles
+    abstract ConfigurableFileCollection getLibraryFiles()
+
+    @TaskAction
+    void exec() {
+        // The point here is that the command generates an output file in the output dir
+        // My real task takes the input and generates a number outputs in the output dir
+        // that I want to make available in an output property for other tasks to consume
+        project.exec {
+            executable "touch"
+            args outputDir.get().file("${libName.get()}-${libVersion.get()}-eg.txt")
+        }
+        libraryFiles = outputDir.files("${libName.get()}-${libVersion.get()}-eg.txt")
+    }
+}
+
+tasks.register("buildThing", ProblemTask) {
+    libName = "the-lib"
+    libVersion = "1.0.1"
+    outputDir = layout.buildDirectory.dir("lib")
+}
+
+tasks.register("bundle", Zip) {
+    from tasks.named("buildThing").map { it.libraryFiles }
+    destinationDirectory = layout.buildDirectory
+    archiveFileName = "output.zip"
+}
